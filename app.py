@@ -1,15 +1,11 @@
 import streamlit as st
-import pandas as pd 
-import numpy as np
+import pandas as pd
 
-st.title("Manipulate Streamlit Chart")
-#Generate Randomn Data
-bar_data = pd.DataFrame(np.random.randn(20, 3),columns=["a", "b", "c"])
-st.bar_chart(bar_data)
-#Generate random data for line chart
-line_data = pd.DataFrame(np.random.randn(20, 3),columns=["a", "b", "c"])
-st.line_chart(line_data)
+st.title("CSV File Uploader")
 
-#Generate random data for scatter chart 
-chart_data = pd.DataFrame(np.random.randn(20, 3), columns=["a", "b", "c"])
-st.scatter_chart(chart_data)
+uploaded_file = st.file_uploader("upload a csv file", type=["csv"])
+
+if uploaded_file is not None:
+    df = pd.read_csv(uploaded_file)  # Use the uploaded file variable directly
+    st.write("### Preview of Uploaded Data:")
+    st.dataframe(df.head())
