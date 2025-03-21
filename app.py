@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import matplotlib.pyplot as plt
 
 st.set_page_config(page_title="Car Sharing Dashboard", layout="wide")
 
@@ -148,7 +149,6 @@ avg_duration_by_city = trips_merged.groupby("city_name")["trip_duration"].mean()
 
 st.subheader(" Average Trip Duration by City")
 st.bar_chart(avg_duration_by_city)
-import matplotlib.pyplot as plt
 
 st.subheader(" Revenue Share by City")
 
