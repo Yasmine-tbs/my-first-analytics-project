@@ -1,56 +1,66 @@
 import streamlit as st
 import pandas as pd
 
-st.set_page_config(layout="wide")
-st.title("Visualize CSV Data with Streamlit ")
+@st.cache_data
+def load_data():
+    trips = pd.read_csv("Datasets/trips.csv")  
+    cars = pd.read_csv("Datasets/cars.csv")
+    cities = pd.read_csv("Datasets/cities.csv")
+    return trips, cars, cities
 
-df = pd.read_csv("Datasets/trips_data_1000.csv")
-print(df.describe())
+trips, cars, cities = load_data()
 
-cars_brand = st.sidebar.multiselect("Select the car brand", df["car_brand"].unique(),  df["car_brand"].unique())
-df = df[df["car_brand"].isin(cars_brand)]
+trips_merged = trips.merge(cars, left_on="car_id", right_on="id", how="left")
 
-col1, col2, col3, col4  = st.columns(4)
+trips_merged = trips_merged.merge(cities, left_on="city_id", right_on="city_id", how="left")
 
-col1.metric("Car Models in Use", df.shape[0])
-col2.metric("Unique Customers",  df["customer_email"].nunique())
-with col3:
-    total_distance = df['distance'].sum() / 1000
-    st.metric("Total Distance", value=f"{total_distance:.2f} K")
-with col4:
-    average_revenue = df['revenue'].mean()
-    st.metric("Average Revenue Per Trip", value=f"{average_revenue:.2f} €")
+columns_to_drop = ["id", "id_customer", "city_id", "id_car"]
+existing_columns = [col for col in columns_to_drop if col in trips_merged.columns]
+trips_merged = trips_merged.drop(columns=existing_columns)
+
+trips_merged["pickup_time"] = pd.to_datetime(trips_merged["pickup_time"])
+trips_merged["dropoff_time"] = pd.to_datetime(trips_merged["dropoff_time"])
+
+trips_merged["pickup_date"] = trips_merged["pickup_time"].dt.date
+
+cars_brand = st.sidebar.multiselect(
+    "Select the Car Brand", 
+    trips_merged["brand"].dropna().unique()
+)
+
+if cars_brand:
+    trips_merged = trips_merged[trips_merged["brand"].isin(cars_brand)]
+
+total_trips = len(trips_merged)
+total_distance = trips_merged["distance"].sum()
+top_car = trips_merged.groupby("model")["revenue"].sum().idxmax()
 
 col1, col2, col3 = st.columns(3)
-# Chart 1: Bar chart of customers by country
+
 with col1:
-    st.subheader("Customers by City")
-    country_counts = df['customer_city'].value_counts()
-    st.bar_chart(country_counts)
+    st.metric(label="Total Trips", value=total_trips)
 
-# Chart 2 : Revenue by Car Model
 with col2:
-    st.subheader("Revenue by Car Model")
-    revenue_by_car = df.groupby('car_model')['revenue'].sum()
-    st.bar_chart(revenue_by_car)
-# Chart 3 : Average Trip distance per city
+    st.metric(label="Top Car Model by Revenue", value=top_car)
+
 with col3:
-    st.subheader("Average Trip Distance per city")
-    avg_distance_by_city = df.groupby('customer_city')['distance'].mean()
-    st.bar_chart(avg_distance_by_city)
-# Convert the pickup time to a date type column 
-df['Trips Date'] = pd.to_datetime(df['pickup_time']).dt.date
+    st.metric(label="Total Distance (km)", value=f"{total_distance:,.2f}")
 
-# Chart 3: Revenue over time 
-st.subheader("Revenue Over Time")
-revenue_over_time = df.groupby('Trips Date')['revenue'].sum()
-st.area_chart(revenue_over_time)
+st.write("### Preview of Final Trips Data", trips_merged.head())
+trips_over_time = trips_merged.groupby("pickup_date").size()
 
-# Chart 4: Line chart of Trips over time
 st.subheader("Trips Over Time")
-Trips_Count = df["Trips Date"].value_counts()
-st.line_chart(Trips_Count)
+st.line_chart(trips_over_time)
+revenue_by_model = trips_merged.groupby("model")["revenue"].sum().sort_values(ascending=False)
 
-st.write(" Preview Uploaded data")
-st.dataframe(df.head())
+st.subheader("Revenue by Car Model")
+st.bar_chart(revenue_by_model)
+daily_revenue = trips_merged.groupby("pickup_date")["revenue"].sum()
+cumulative_revenue = daily_revenue.cumsum()
+
+st.subheader("Cumulative Revenue Over Time")
+st.area_chart(cumulative_revenue)
+revenue_by_city = trips_merged.groupby("city_name")["revenue"].sum().sort_values(ascending=False)
+st.subheader(" Revenue by City")
+st.bar_chart(revenue_by_city)
 
