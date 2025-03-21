@@ -64,3 +64,23 @@ revenue_by_city = trips_merged.groupby("city_name")["revenue"].sum().sort_values
 st.subheader(" Revenue by City")
 st.bar_chart(revenue_by_city)
 
+trips_per_model = trips_merged["model"].value_counts()
+
+st.subheader("Number of Trips Per Car Model")
+st.bar_chart(trips_per_model)
+trips_merged["trip_duration"] = (trips_merged["dropoff_time"] - trips_merged["pickup_time"]).dt.total_seconds() / 60
+
+avg_duration_by_city = trips_merged.groupby("city_name")["trip_duration"].mean().sort_values(ascending=False)
+
+st.subheader(" Average Trip Duration by City")
+st.bar_chart(avg_duration_by_city)
+import matplotlib.pyplot as plt
+
+st.subheader(" Revenue Share by City")
+
+fig, ax = plt.subplots()
+revenue_by_city.plot(kind="pie", autopct="%1.1f%%", ax=ax)
+ax.set_ylabel("")  # Hide y-axis label
+
+st.pyplot(fig)
+
