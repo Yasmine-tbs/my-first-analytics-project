@@ -3,6 +3,72 @@ import pandas as pd
 
 st.set_page_config(page_title="Car Sharing Dashboard", layout="wide")
 
+page_bg = """
+<style>
+/* Clean and Professional White Background */
+[data-testid="stAppViewContainer"] {
+    background: #F8F9FA;
+    color: black;
+}
+
+/* Sidebar Design - Subtle Grey */
+[data-testid="stSidebar"] {
+    background: #FFFFFF;
+    border-right: 2px solid #E0E0E0;
+    color: black;
+}
+
+/* Modern Header */
+h1, h2, h3 {
+    color: #2C3E50;
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+/* Metric Box Enhancements */
+[data-testid="stMetric"] {
+    background: #FFFFFF;
+    border: 1px solid #E0E0E0;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+}
+
+/* Glass Effect on Data Tables */
+[data-testid="stDataFrame"], .stTable {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #E0E0E0;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+/* Button Styling */
+.stButton>button {
+    background-color: #3498DB;
+    color: white;
+    border-radius: 5px;
+    font-weight: bold;
+    padding: 10px 15px;
+    border: none;
+}
+
+/* Improve Dropdown & Multiselect */
+[data-baseweb="select"] {
+    background-color: white;
+    border-radius: 8px;
+    border: 1px solid #E0E0E0;
+}
+
+/* Subtle Card Shadows */
+[data-testid="stMetric"], [data-testid="stDataFrame"], .stTable {
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.05);
+}
+</style>
+"""
+st.markdown(page_bg, unsafe_allow_html=True)
+
+
 st.title("🚗 Car Sharing Analytics Dashboard")
 
 st.markdown("Welcome to the Car Sharing Dashboard! Explore trends, revenue, and key business insights from car rentals across various cities.")
