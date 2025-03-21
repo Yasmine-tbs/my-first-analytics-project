@@ -53,3 +53,4 @@ st.line_chart(Trips_Count)
 
 st.write(" Preview Uploaded data")
 st.dataframe(df.head())
+
