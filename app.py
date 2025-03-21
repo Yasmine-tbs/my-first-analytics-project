@@ -1,6 +1,14 @@
 import streamlit as st
 import pandas as pd
 
+st.set_page_config(page_title="Car Sharing Dashboard", layout="wide")
+
+st.title("🚗 Car Sharing Analytics Dashboard")
+
+st.markdown("Welcome to the Car Sharing Dashboard! Explore trends, revenue, and key business insights from car rentals across various cities.")
+
+st.markdown("---")
+
 @st.cache_data
 def load_data():
     trips = pd.read_csv("Datasets/trips.csv")  
@@ -83,4 +91,3 @@ revenue_by_city.plot(kind="pie", autopct="%1.1f%%", ax=ax)
 ax.set_ylabel("")  # Hide y-axis label
 
 st.pyplot(fig)
-
